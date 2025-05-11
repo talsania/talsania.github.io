@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const connectionDistance = Math.min(width, height) / 4;
     
     const colors = ['#bc9eff', '#8a6aff', '#6d4dff', '#5d3dff'];
+    let gpuMode = false;
+    let gpuModeActive = false;
+    let gpuParticles = [];
     
     class Node {
         constructor() {
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = gpuMode ? this.gpuColor || this.color : this.color;
             ctx.fill();
         }
 
@@ -70,8 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.beginPath();
                 ctx.moveTo(this.x, this.y);
                 ctx.lineTo(node.x, node.y);
-                ctx.strokeStyle = 'rgba(188, 158, 255, 0.15)';
-                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = gpuMode ? 'rgba(76, 217, 100, 0.2)' : 'rgba(188, 158, 255, 0.15)';
+                ctx.lineWidth = gpuMode ? 1 : 0.5;
                 ctx.stroke();
             });
         }
@@ -84,10 +87,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 const y = this.y + (target.y - this.y) * progress;
                 
                 ctx.beginPath();
-                ctx.arc(x, y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(188, 158, 255, 0.8)';
+                ctx.arc(x, y, gpuMode ? 3 : 2, 0, Math.PI * 2);
+                ctx.fillStyle = gpuMode ? 'rgba(76, 217, 100, 0.8)' : 'rgba(188, 158, 255, 0.8)';
                 ctx.fill();
             });
+        }
+    }
+    
+    class GPUParticle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 4 + 1;
+            this.speedX = (Math.random() - 0.5) * 3;
+            this.speedY = (Math.random() - 0.5) * 3;
+            this.life = 100 + Math.random() * 100;
+            this.opacity = Math.random() * 0.7 + 0.3;
+            this.color = `rgba(76, 217, 100, ${this.opacity})`;
+        }
+        
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life -= 1;
+            this.opacity -= 0.005;
+            if (this.opacity < 0) this.opacity = 0;
+            this.color = `rgba(76, 217, 100, ${this.opacity})`;
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.rect(this.x, this.y, this.size, this.size);
+            ctx.fillStyle = this.color;
+            ctx.fill();
         }
     }
 
@@ -110,6 +142,77 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    
+    function toggleGPUMode() {
+        gpuMode = !gpuMode;
+        
+        if (gpuMode) {
+            document.body.style.background = 'linear-gradient(135deg, #0a2613 0%, #134a1e 100%)';
+            document.querySelector('.container').style.background = 'rgba(10, 38, 19, 0.5)';
+            showGPUStartupAnimation();
+            
+            const titleElement = document.querySelector('.title');
+            if (titleElement) {
+                titleElement.textContent = "GPU Wizard & Systems Engineer";
+                
+                setTimeout(() => {
+                    titleElement.textContent = "Systems Engineer & GPU Enthusiast";
+                }, 3000);
+            }
+        } else {
+            document.body.style.background = 'linear-gradient(135deg, #1e1033 0%, #301b5e 100%)';
+            document.querySelector('.container').style.background = 'rgba(20, 10, 40, 0.5)';
+            gpuParticles = [];
+        }
+    }
+    
+    function showGPUStartupAnimation() {
+        gpuModeActive = true;
+        
+        const gpuStartupText = "GPU ACCELERATION ACTIVATED";
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.background = 'rgba(0, 0, 0, 0.7)';
+        overlay.style.zIndex = '100';
+        overlay.style.color = '#4CD964';
+        overlay.style.fontFamily = 'monospace';
+        overlay.style.fontSize = '2rem';
+        overlay.style.fontWeight = 'bold';
+        overlay.style.textShadow = '0 0 10px rgba(76, 217, 100, 0.7)';
+        
+        document.body.appendChild(overlay);
+        
+        let charIndex = 0;
+        const startupInterval = setInterval(() => {
+            overlay.textContent = gpuStartupText.substring(0, charIndex);
+            charIndex++;
+            
+            if (charIndex > gpuStartupText.length) {
+                clearInterval(startupInterval);
+                
+                setTimeout(() => {
+                    document.body.removeChild(overlay);
+                    
+                    for (let i = 0; i < 100; i++) {
+                        setTimeout(() => {
+                            for (let j = 0; j < 5; j++) {
+                                gpuParticles.push(new GPUParticle());
+                            }
+                        }, i * 20);
+                    }
+                }, 500);
+            }
+        }, 50);
+    }
 
     function drawCircuitPattern() {
         ctx.clearRect(0, 0, width, height);
@@ -123,6 +226,20 @@ document.addEventListener('DOMContentLoaded', function() {
             node.draw();
             node.drawPulses();
         });
+        
+        if (gpuMode) {
+            gpuParticles = gpuParticles.filter(particle => particle.life > 0);
+            gpuParticles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            if (gpuModeActive && Math.random() < 0.1) {
+                for (let i = 0; i < 3; i++) {
+                    gpuParticles.push(new GPUParticle());
+                }
+            }
+        }
         
         requestAnimationFrame(drawCircuitPattern);
     }
@@ -142,6 +259,26 @@ document.addEventListener('DOMContentLoaded', function() {
         circuitNodes.length = 0;
         initNodes();
     }
+
+    let shiftPressed = false;
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Shift') {
+            shiftPressed = true;
+        } else if (e.key.toLowerCase() === 'g' && shiftPressed) {
+            toggleGPUMode();
+        }
+    });
+    
+    document.addEventListener('keyup', function(e) {
+        if (e.key === 'Shift') {
+            shiftPressed = false;
+        }
+    });
+    
+    document.querySelector('.profile-image-container').addEventListener('dblclick', function() {
+        toggleGPUMode();
+    });
 
     window.addEventListener('resize', handleResize);
     
