@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const titleElement = document.querySelector('.title');
             if (titleElement) {
-                titleElement.textContent = "GPU Wizard & Systems Engineer";
+                titleElement.textContent = "Systems Engineer & GPU Wizard";
                 
                 setTimeout(() => {
                     titleElement.textContent = "Systems Engineer & GPU Enthusiast";
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showGPUStartupAnimation() {
         gpuModeActive = true;
         
-        const gpuStartupText = "GPU ACCELERATION ACTIVATED";
+        const gpuStartupText = "FAN NOISE INTENSIFIES";
         const containerRect = document.querySelector('.container').getBoundingClientRect();
         
         const overlay = document.createElement('div');
