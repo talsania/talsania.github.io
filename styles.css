@@ -15,6 +15,7 @@ body {
     padding: 1.5rem;
     position: relative;
     overflow: hidden;
+    transition: background 0.8s ease;
 }
 
 canvas {
@@ -42,7 +43,7 @@ canvas {
     position: relative;
     z-index: 10;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.8s ease;
 }
 
 .container:hover {
@@ -56,6 +57,7 @@ canvas {
     inset: 0;
     background: radial-gradient(circle at 100% 100%, rgba(188, 158, 255, 0.1) 0%, transparent 50%);
     z-index: -1;
+    transition: background 0.8s ease;
 }
 
 .profile-section {
@@ -75,6 +77,7 @@ canvas {
     border-radius: 50%;
     overflow: hidden;
     transition: transform 0.5s ease;
+    cursor: pointer;
 }
 
 .profile-image-container::before {
@@ -85,6 +88,7 @@ canvas {
     border-radius: 50%;
     animation: rotate 4s linear infinite;
     z-index: -1;
+    transition: background 0.8s ease;
 }
 
 @keyframes rotate {
@@ -103,7 +107,7 @@ canvas {
     object-fit: cover;
     border: 3px solid rgba(20, 10, 40, 0.8);
     box-shadow: 0 0 20px rgba(188, 158, 255, 0.3);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, border 0.8s ease, box-shadow 0.8s ease;
 }
 
 .profile-image-container:hover {
@@ -117,7 +121,7 @@ h1 {
     color: #ffffff;
     letter-spacing: -0.02em;
     text-shadow: 0 0 10px rgba(188, 158, 255, 0.3);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, text-shadow 0.8s ease;
 }
 
 h1:hover {
@@ -130,7 +134,7 @@ h1:hover {
     margin: 0;
     font-weight: 500;
     opacity: 0.9;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, color 0.8s ease;
 }
 
 .title:hover {
@@ -188,7 +192,7 @@ h1:hover {
     height: 2px;
     background: linear-gradient(90deg, transparent, #bc9eff, transparent);
     transform: scaleX(0);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, background 0.8s ease;
 }
 
 .link:hover {
@@ -216,6 +220,21 @@ h1:hover {
 
 .link:hover svg {
     transform: scale(1.1);
+}
+
+.hint-text {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.profile-image-container:hover + .hint-text {
+    opacity: 1;
 }
 
 @media (max-width: 600px) {
