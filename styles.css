@@ -74,7 +74,8 @@ canvas {
     height: 130px;
     border-radius: 50%;
     overflow: hidden;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
 }
 
 .profile-image-container::before {
@@ -96,6 +97,15 @@ canvas {
     }
 }
 
+@keyframes fastRotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .profile-image {
     width: 100%;
     height: 100%;
@@ -103,7 +113,7 @@ canvas {
     object-fit: cover;
     border: 3px solid rgba(20, 10, 40, 0.8);
     box-shadow: 0 0 20px rgba(188, 158, 255, 0.3);
-    transition: transform 0.3s ease;
+    transition: all 0.5s ease;
 }
 
 .profile-image-container:hover {
