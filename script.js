@@ -14,15 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const circuitNodes = [];
     const numNodes = Math.min(Math.floor(width * height / 20000), 50);
-    let connectionDistance = Math.min(width, height) / 4;
+    const connectionDistance = Math.min(width, height) / 4;
     
     const colors = ['#bc9eff', '#8a6aff', '#6d4dff', '#5d3dff'];
-    
-    let turboMode = false;
-    let turboIntensity = 0;
-    const maxTurboIntensity = 1;
-    const turboIncrement = 0.05;
-    const turboDecrement = 0.02;
+    let gpuMode = false;
+    let gpuModeActive = false;
+    let gpuParticles = [];
     
     class Node {
         constructor() {
@@ -30,53 +27,30 @@ document.addEventListener('DOMContentLoaded', function() {
             this.y = Math.random() * height;
             this.vx = (Math.random() - 0.5) * 0.5;
             this.vy = (Math.random() - 0.5) * 0.5;
-            this.baseVx = this.vx;
-            this.baseVy = this.vy;
             this.radius = Math.random() * 3 + 1;
-            this.baseRadius = this.radius;
             this.color = colors[Math.floor(Math.random() * colors.length)];
             this.connections = [];
             this.pulses = [];
-            this.initialX = this.x;
-            this.initialY = this.y;
-            this.vibrationPhaseX = Math.random() * Math.PI * 2;
-            this.vibrationPhaseY = Math.random() * Math.PI * 2;
-            this.vibrationSpeed = 0.1 + Math.random() * 0.2;
         }
 
         update() {
-            const turboFactor = 1 + (turboIntensity * 3);
-            this.vx = this.baseVx * turboFactor;
-            this.vy = this.baseVy * turboFactor;
-            
             this.x += this.vx;
             this.y += this.vy;
             
-            if (turboIntensity > 0) {
-                const vibrationAmount = turboIntensity * 3;
-                this.x += Math.sin(Date.now() * this.vibrationSpeed * 0.01 + this.vibrationPhaseX) * vibrationAmount;
-                this.y += Math.cos(Date.now() * this.vibrationSpeed * 0.01 + this.vibrationPhaseY) * vibrationAmount;
-                this.radius = this.baseRadius * (1 + turboIntensity * 0.5);
-            }
-            
             if (this.x < 0 || this.x > width) {
                 this.vx *= -1;
-                this.baseVx *= -1;
             }
             
             if (this.y < 0 || this.y > height) {
                 this.vy *= -1;
-                this.baseVy *= -1;
             }
             
-            const pulseSpeed = 0.02 * (1 + turboIntensity * 2);
             this.pulses = this.pulses.filter(pulse => {
-                pulse.progress += pulseSpeed;
+                pulse.progress += 0.02;
                 return pulse.progress <= 1;
             });
             
-            const pulseChance = 0.002 * (1 + turboIntensity * 5);
-            if (Math.random() < pulseChance && this.connections.length > 0) {
+            if (Math.random() < 0.002) {
                 const target = this.connections[Math.floor(Math.random() * this.connections.length)];
                 if (target) {
                     this.pulses.push({
@@ -90,20 +64,17 @@ document.addEventListener('DOMContentLoaded', function() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = gpuMode ? this.gpuColor || this.color : this.color;
             ctx.fill();
         }
 
         drawConnections() {
-            const opacity = 0.15 + turboIntensity * 0.15;
-            const lineWidth = 0.5 + turboIntensity * 0.5;
-            
             this.connections.forEach(node => {
                 ctx.beginPath();
                 ctx.moveTo(this.x, this.y);
                 ctx.lineTo(node.x, node.y);
-                ctx.strokeStyle = `rgba(188, 158, 255, ${opacity})`;
-                ctx.lineWidth = lineWidth;
+                ctx.strokeStyle = gpuMode ? 'rgba(76, 217, 100, 0.2)' : 'rgba(188, 158, 255, 0.15)';
+                ctx.lineWidth = gpuMode ? 1 : 0.5;
                 ctx.stroke();
             });
         }
@@ -115,21 +86,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 const x = this.x + (target.x - this.x) * progress;
                 const y = this.y + (target.y - this.y) * progress;
                 
-                const pulseSize = 2 + turboIntensity * 2;
-                const glowIntensity = 0.8 + turboIntensity * 0.2;
-                
-                if (turboIntensity > 0.3) {
-                    ctx.beginPath();
-                    ctx.arc(x, y, pulseSize * 2, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(188, 158, 255, ${0.2 * turboIntensity})`;
-                    ctx.fill();
-                }
-                
                 ctx.beginPath();
-                ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(188, 158, 255, ${glowIntensity})`;
+                ctx.arc(x, y, gpuMode ? 3 : 2, 0, Math.PI * 2);
+                ctx.fillStyle = gpuMode ? 'rgba(76, 217, 100, 0.8)' : 'rgba(188, 158, 255, 0.8)';
                 ctx.fill();
             });
+        }
+    }
+    
+    class GPUParticle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 4 + 1;
+            this.speedX = (Math.random() - 0.5) * 3;
+            this.speedY = (Math.random() - 0.5) * 3;
+            this.life = 100 + Math.random() * 100;
+            this.opacity = Math.random() * 0.7 + 0.3;
+            this.color = `rgba(76, 217, 100, ${this.opacity})`;
+        }
+        
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life -= 1;
+            this.opacity -= 0.005;
+            if (this.opacity < 0) this.opacity = 0;
+            this.color = `rgba(76, 217, 100, ${this.opacity})`;
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.rect(this.x, this.y, this.size, this.size);
+            ctx.fillStyle = this.color;
+            ctx.fill();
         }
     }
 
@@ -138,16 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
             circuitNodes.push(new Node());
         }
         
-        updateConnections();
-    }
-    
-    function updateConnections() {
-        circuitNodes.forEach(node => {
-            node.connections = [];
-        });
-        
-        const currentConnectionDistance = connectionDistance * (1 + turboIntensity * 0.5);
-        
         circuitNodes.forEach(node => {
             circuitNodes.forEach(otherNode => {
                 if (node !== otherNode) {
@@ -155,34 +135,87 @@ document.addEventListener('DOMContentLoaded', function() {
                     const dy = node.y - otherNode.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     
-                    const connectionProbability = 0.3 * (1 + turboIntensity * 0.7);
-                    if (distance < currentConnectionDistance && Math.random() < connectionProbability) {
+                    if (distance < connectionDistance && Math.random() < 0.3) {
                         node.connections.push(otherNode);
                     }
                 }
             });
         });
     }
+    
+    function toggleGPUMode() {
+        gpuMode = !gpuMode;
+        
+        if (gpuMode) {
+            document.body.style.background = 'linear-gradient(135deg, #0a2613 0%, #134a1e 100%)';
+            document.querySelector('.container').style.background = 'rgba(10, 38, 19, 0.5)';
+            showGPUStartupAnimation();
+            
+            const titleElement = document.querySelector('.title');
+            if (titleElement) {
+                titleElement.textContent = "GPU Wizard & Systems Engineer";
+                
+                setTimeout(() => {
+                    titleElement.textContent = "Systems Engineer & GPU Enthusiast";
+                }, 3000);
+            }
+        } else {
+            document.body.style.background = 'linear-gradient(135deg, #1e1033 0%, #301b5e 100%)';
+            document.querySelector('.container').style.background = 'rgba(20, 10, 40, 0.5)';
+            gpuParticles = [];
+        }
+    }
+    
+    function showGPUStartupAnimation() {
+        gpuModeActive = true;
+        
+        const gpuStartupText = "GPU ACCELERATION ACTIVATED";
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.background = 'rgba(0, 0, 0, 0.7)';
+        overlay.style.zIndex = '100';
+        overlay.style.color = '#4CD964';
+        overlay.style.fontFamily = 'monospace';
+        overlay.style.fontSize = '2rem';
+        overlay.style.fontWeight = 'bold';
+        overlay.style.textShadow = '0 0 10px rgba(76, 217, 100, 0.7)';
+        
+        document.body.appendChild(overlay);
+        
+        let charIndex = 0;
+        const startupInterval = setInterval(() => {
+            overlay.textContent = gpuStartupText.substring(0, charIndex);
+            charIndex++;
+            
+            if (charIndex > gpuStartupText.length) {
+                clearInterval(startupInterval);
+                
+                setTimeout(() => {
+                    document.body.removeChild(overlay);
+                    
+                    for (let i = 0; i < 100; i++) {
+                        setTimeout(() => {
+                            for (let j = 0; j < 5; j++) {
+                                gpuParticles.push(new GPUParticle());
+                            }
+                        }, i * 20);
+                    }
+                }, 500);
+            }
+        }, 50);
+    }
 
     function drawCircuitPattern() {
         ctx.clearRect(0, 0, width, height);
-        
-        if (turboMode && turboIntensity < maxTurboIntensity) {
-            turboIntensity += turboIncrement;
-            if (turboIntensity > maxTurboIntensity) {
-                turboIntensity = maxTurboIntensity;
-            }
-            
-            if (Math.random() < 0.1) {
-                updateConnections();
-            }
-        } else if (!turboMode && turboIntensity > 0) {
-            turboIntensity -= turboDecrement;
-            if (turboIntensity < 0) {
-                turboIntensity = 0;
-                updateConnections();
-            }
-        }
         
         circuitNodes.forEach(node => {
             node.update();
@@ -194,20 +227,18 @@ document.addEventListener('DOMContentLoaded', function() {
             node.drawPulses();
         });
         
-        if (turboIntensity > 0) {
-            const blurAmount = turboIntensity * 20;
-            document.body.style.filter = `blur(${blurAmount * 0.15}px)`;
-            document.querySelector('.container').style.filter = `blur(${blurAmount * 0.05}px)`;
+        if (gpuMode) {
+            gpuParticles = gpuParticles.filter(particle => particle.life > 0);
+            gpuParticles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
             
-            const glowAmount = Math.floor(turboIntensity * 15);
-            const containerElement = document.querySelector('.container');
-            containerElement.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.3), 
-                                               inset 0 2px 3px rgba(255, 255, 255, 0.05), 
-                                               0 0 ${glowAmount}px rgba(188, 158, 255, ${turboIntensity * 0.5})`;
-        } else {
-            document.body.style.filter = '';
-            document.querySelector('.container').style.filter = '';
-            document.querySelector('.container').style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.05)';
+            if (gpuModeActive && Math.random() < 0.1) {
+                for (let i = 0; i < 3; i++) {
+                    gpuParticles.push(new GPUParticle());
+                }
+            }
         }
         
         requestAnimationFrame(drawCircuitPattern);
@@ -229,50 +260,27 @@ document.addEventListener('DOMContentLoaded', function() {
         initNodes();
     }
 
+    let shiftPressed = false;
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Shift') {
+            shiftPressed = true;
+        } else if (e.key.toLowerCase() === 'g' && shiftPressed) {
+            toggleGPUMode();
+        }
+    });
+    
+    document.addEventListener('keyup', function(e) {
+        if (e.key === 'Shift') {
+            shiftPressed = false;
+        }
+    });
+    
+    document.querySelector('.profile-image-container').addEventListener('dblclick', function() {
+        toggleGPUMode();
+    });
+
     window.addEventListener('resize', handleResize);
-    
-    const profileImage = document.querySelector('.profile-image-container');
-    let clickCount = 0;
-    let clickTimer;
-    
-    profileImage.addEventListener('click', () => {
-        clickCount++;
-        
-        if (clickCount === 1) {
-            turboMode = !turboMode;
-            
-            if (turboMode) {
-                profileImage.style.transform = 'scale(1.2) rotate(5deg)';
-                setTimeout(() => {
-                    profileImage.style.transform = 'scale(1.05)';
-                }, 300);
-            } else {
-                profileImage.style.transform = 'scale(0.9) rotate(-5deg)';
-                setTimeout(() => {
-                    profileImage.style.transform = '';
-                }, 300);
-            }
-        }
-        
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => {
-            clickCount = 0;
-        }, 500);
-    });
-    
-    profileImage.addEventListener('mouseover', () => {
-        if (turboMode) {
-            profileImage.style.transform = 'scale(1.1)';
-        }
-    });
-    
-    profileImage.addEventListener('mouseout', () => {
-        if (turboMode) {
-            profileImage.style.transform = 'scale(1.05)';
-        } else {
-            profileImage.style.transform = '';
-        }
-    });
     
     initNodes();
     drawCircuitPattern();
