@@ -3,183 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Krishang</title>
+  <title>Krishang Talsania</title>
+  <meta name="description" content="Systems Engineer & GPU Enthusiast focusing on ML and hardware optimization">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #1e1033 0%, #301b5e 100%);
-      color: #e4e4e4;
-      padding: 1.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 700px;
-      background: rgba(20, 10, 40, 0.5);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 2px 3px rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      z-index: 10;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        circle at 100% 100%,
-        rgba(188, 158, 255, 0.1) 0%,
-        transparent 50%
-      );
-      z-index: -1;
-    }
-
-    .profile-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      width: 100%;
-    }
-
-    .profile-image {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid rgba(188, 158, 255, 0.3);
-      box-shadow: 0 0 20px rgba(188, 158, 255, 0.3);
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin: 0.5rem 0 0;
-      color: #ffffff;
-      letter-spacing: -0.02em;
-      text-shadow: 0 0 10px rgba(188, 158, 255, 0.3);
-    }
-
-    .title {
-      font-size: 1.1rem;
-      color: #bc9eff;
-      margin: 0;
-      font-weight: 500;
-    }
-
-    .bio {
-      margin: 1rem 0;
-      font-size: 1.05rem;
-      color: #d4cce8;
-      line-height: 1.6;
-      text-align: center;
-      max-width: 580px;
-    }
-
-    .links {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .link {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.7rem 1.2rem;
-      background: rgba(30, 16, 51, 0.5);
-      border-radius: 12px;
-      text-decoration: none;
-      color: #ffffff;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(188, 158, 255, 0.2);
-      min-width: 130px;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .link:hover {
-      background: rgba(188, 158, 255, 0.15);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-      border-color: rgba(188, 158, 255, 0.4);
-    }
-
-    .link svg {
-      margin-right: 0.5rem;
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 600px) {
-      body { padding: 1rem; }
-      .container { padding: 2rem 1.5rem; border-radius: 20px; }
-      h1 { font-size: 1.8rem; }
-      .title { font-size: 1rem; }
-      .bio { font-size: 0.95rem; padding: 0 0.5rem; }
-      .profile-image { width: 100px; height: 100px; }
-      .links { gap: 0.8rem; }
-      .link { padding: 0.6rem 1rem; min-width: 120px; font-size: 0.95rem; }
-    }
-  </style>
-<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
-<link rel="shortcut icon" href="img/favicon.ico">
-<link rel="manifest" href="img/site.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="manifest" href="img/site.webmanifest">
 </head>
 <body>
   <canvas id="circuitCanvas"></canvas>
 
-  <div class="container">
-    <div class="profile-section">
+  <main class="container">
+    <section class="profile-section">
       <img src="img/profile.jpg" alt="Krishang Talsania" class="profile-image" />
       <h1>Krishang Talsania</h1>
       <div class="title">Systems Engineer & GPU Enthusiast</div>
-    </div>
+    </section>
 
     <p class="bio">
-      My interest lies in optimizing the intersection of machine learning and hardware through compiler techniques and low-level systems. I am actively exploring GPU architecture, ML acceleration, and driver development, with the goal of contributing efficient computational pathways between algorithms and silicon.
+      My interest lies in optimizing the intersection of machine learning and hardware through compiler techniques and low-level systems. I am actively exploring GPU architecture, ML acceleration, and driver development, with the goal of contributing efficient computational pathways between algorithms and silicon.
     </p>
 
     <div class="links">
@@ -200,143 +44,41 @@
         </svg>
         LinkedIn
       </a>
+      <a href="#" class="link project-link" id="projectsBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        Projects
+      </a>
     </div>
-  </div>
+    
+    <section class="projects-section" id="projectsSection">
+      <h2>Featured Projects</h2>
+      <div class="project-cards">
+        <div class="project-card">
+          <h3>GPU Compiler Optimization</h3>
+          <p>Developed optimization techniques for ML workloads on modern GPU architectures, improving inference speed by 35%.</p>
+          <div class="tech-tags">
+            <span>CUDA</span>
+            <span>LLVM</span>
+            <span>PyTorch</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <h3>Low-Level Driver Development</h3>
+          <p>Custom driver implementation focused on real-time processing requirements for ML acceleration hardware.</p>
+          <div class="tech-tags">
+            <span>C++</span>
+            <span>Linux Kernel</span>
+            <span>GPGPU</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const canvas = document.getElementById('circuitCanvas');
-      const ctx = canvas.getContext('2d');
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-      
-      canvas.width = width;
-      canvas.height = height;
-      
-      const circuitNodes = [];
-      const numNodes = Math.min(Math.floor(width * height / 20000), 50);
-      const connectionDistance = Math.min(width, height) / 4;
-      const colors = ['#bc9eff', '#8a6aff', '#6d4dff', '#5d3dff'];
-      
-      class Node {
-        constructor() {
-          this.x = Math.random() * width;
-          this.y = Math.random() * height;
-          this.vx = (Math.random() - 0.5) * 0.5;
-          this.vy = (Math.random() - 0.5) * 0.5;
-          this.radius = Math.random() * 3 + 1;
-          this.color = colors[Math.floor(Math.random() * colors.length)];
-          this.connections = [];
-          this.pulses = [];
-        }
-        
-        update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          
-          if (this.x < 0 || this.x > width) this.vx *= -1;
-          if (this.y < 0 || this.y > height) this.vy *= -1;
-          
-          this.pulses = this.pulses.filter(pulse => {
-            pulse.progress += 0.02;
-            return pulse.progress <= 1;
-          });
-          
-          if (Math.random() < 0.002) {
-            const target = this.connections[Math.floor(Math.random() * this.connections.length)];
-            if (target) {
-              this.pulses.push({
-                targetNode: target,
-                progress: 0
-              });
-            }
-          }
-        }
-        
-        draw() {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          ctx.fillStyle = this.color;
-          ctx.fill();
-        }
-        
-        drawConnections() {
-          this.connections.forEach(node => {
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(node.x, node.y);
-            ctx.strokeStyle = 'rgba(188, 158, 255, 0.15)';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          });
-        }
-        
-        drawPulses() {
-          this.pulses.forEach(pulse => {
-            const target = pulse.targetNode;
-            const progress = pulse.progress;
-            
-            const x = this.x + (target.x - this.x) * progress;
-            const y = this.y + (target.y - this.y) * progress;
-            
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(188, 158, 255, 0.8)';
-            ctx.fill();
-          });
-        }
-      }
-      
-      function initNodes() {
-        for (let i = 0; i < numNodes; i++) {
-          circuitNodes.push(new Node());
-        }
-        
-        circuitNodes.forEach(node => {
-          circuitNodes.forEach(otherNode => {
-            if (node !== otherNode) {
-              const dx = node.x - otherNode.x;
-              const dy = node.y - otherNode.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < connectionDistance && Math.random() < 0.3) {
-                node.connections.push(otherNode);
-              }
-            }
-          });
-        });
-      }
-      
-      function drawCircuitPattern() {
-        ctx.clearRect(0, 0, width, height);
-        
-        circuitNodes.forEach(node => {
-          node.update();
-          node.drawConnections();
-        });
-        
-        circuitNodes.forEach(node => {
-          node.draw();
-          node.drawPulses();
-        });
-        
-        requestAnimationFrame(drawCircuitPattern);
-      }
-      
-      function handleResize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-        
-        circuitNodes.length = 0;
-        initNodes();
-      }
-      
-      window.addEventListener('resize', handleResize);
-      initNodes();
-      drawCircuitPattern();
-    });
-  </script>
+  <script src="js/circuit.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
