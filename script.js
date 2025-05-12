@@ -151,14 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.container').style.background = 'rgba(10, 38, 19, 0.5)';
             showGPUStartupAnimation();
             
-            const titleElement = document.querySelector('.title');
-            if (titleElement) {
-                titleElement.textContent = "Systems Engineer & GPU Wizard";
-                
-                setTimeout(() => {
-                    titleElement.textContent = "Systems Engineer & GPU Enthusiast";
-                }, 3000);
-            }
         } else {
             document.body.style.background = 'linear-gradient(135deg, #1e1033 0%, #301b5e 100%)';
             document.querySelector('.container').style.background = 'rgba(20, 10, 40, 0.5)';
